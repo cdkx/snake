@@ -1,7 +1,9 @@
 package com.javarush.games;
 
-import javax.swing.JFrame;
-import java.awt.GridBagLayout;
+import lombok.Getter;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
@@ -10,18 +12,25 @@ import java.util.Queue;
 import java.util.concurrent.ArrayBlockingQueue;
 
 
+@Getter
 public class KeyboardObserver extends Thread {
-    private final Queue<KeyEvent> keyEvents = new ArrayBlockingQueue<>(100);
+    private final JFrame frame;
+    private final Queue<KeyEvent> keyEvents;
+    private final Room game;
 
-    static JFrame frame;
+    public KeyboardObserver(Room game) {
+        this.frame = new JFrame();
+        this.keyEvents = new ArrayBlockingQueue<>(100);
+        this.game = game;
+    }
+
 
     @Override
     public void run() {
-        frame = new JFrame("KeyPress Tester");
         frame.setTitle("Snake Game");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setUndecorated(false);
-        frame.setSize((Room.game.getWidth() * 10) + 17, (Room.game.getHeight() * 10) + 40);
+        frame.setSize((game.getWidth() * 10) + 17, (game.getHeight() * 10) + 40);
         frame.setLayout(new GridBagLayout());
         frame.setVisible(true);
 

@@ -3,25 +3,24 @@ package com.javarush.games;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.*;
-
-import static com.javarush.games.Room.game;
-import static com.javarush.games.SnakeDirection.*;
+import java.util.ArrayList;
+import java.util.List;
 
 
+@Getter
+@Setter
 public class Snake {
-    @Setter
-    private SnakeDirection direction;
-    @Getter
     private final List<SnakeSection> sections;
-    @Getter
+    private SnakeDirection direction;
     private boolean isAlive;
+    private Room game;
 
 
     public Snake(int x, int y) {
         sections = new ArrayList<>();
         sections.add(new SnakeSection(x, y));
         isAlive = true;
+        direction = SnakeDirection.DOWN;
     }
 
     public SnakeSection getHead() {
@@ -37,14 +36,11 @@ public class Snake {
             return;
         }
 
-        if (this.direction == UP) {
-            move(0, -1);
-        } else if (this.direction == RIGHT) {
-            move(1, 0);
-        } else if (this.direction == DOWN) {
-            move(0, 1);
-        } else if (this.direction == LEFT) {
-            move(-1, 0);
+        switch (this.direction) {
+            case UP -> move(0, -1);
+            case RIGHT -> move(1, 0);
+            case DOWN -> move(0, 1);
+            case LEFT -> move(-1, 0);
         }
     }
 
@@ -54,23 +50,18 @@ public class Snake {
      */
     private void move(int dx, int dy) {
         // Создаем новую голову
-        SnakeSection newHead = new SnakeSection(getHead().getX() + dx, getHead().getY() + dy);
+        SnakeSection newHead = new SnakeSection(getHead().x() + dx, getHead().y() + dy);
 
         // Проверяем - не вылезла ли голова за границу комнаты
         checkBorders(newHead);
-        if (!isAlive) {
-            return;
-        }
-
-        // Проверяем - не пересекает ли змея  саму себя
+        // Проверяем - не пересекает ли змея саму себя
         checkBody(newHead);
         if (!isAlive) {
             return;
         }
 
         sections.add(0, newHead);
-        if ((newHead.getX() == game.getMouse().getX())
-            && (newHead.getY() == game.getMouse().getY())) {
+        if ((newHead.x() == game.getMouse().x()) && (newHead.y() == game.getMouse().y())) {
             game.eatMouse();
         } else {
             sections.remove(sections.size() - 1);
@@ -81,10 +72,7 @@ public class Snake {
      * Метод проверяет - находится ли новая голова в пределах комнаты
      */
     private void checkBorders(SnakeSection head) {
-        if (((head.getX() < 0)
-             || (head.getX() >= game.getWidth()))
-            || (head.getY() < 0)
-            || (head.getY() >= game.getHeight())) {
+        if (((head.x() < 0) || (head.x() >= game.getWidth())) || (head.y() < 0) || (head.y() >= game.getHeight())) {
             isAlive = false;
         }
     }

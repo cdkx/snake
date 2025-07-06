@@ -3,21 +3,25 @@ plugins {
 }
 
 group = "com.javarush.games"
-version = "1.0-SNAPSHOT"
+version = "1.0"
+
+val junit: String by project
+val jupiter: String by project
+val lombok: String by project
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    testImplementation(platform("org.junit:junit-bom:5.10.2"))
-    testImplementation("org.junit.jupiter:junit-jupiter")
+    testImplementation(platform("org.junit:junit-bom:$junit"))
+    testImplementation("org.junit.jupiter:$jupiter")
 
-    compileOnly("org.projectlombok:lombok:1.18.32")
-    annotationProcessor ("org.projectlombok:lombok:1.18.32")
+    compileOnly("org.projectlombok:lombok:$lombok")
+    annotationProcessor("org.projectlombok:lombok:$lombok")
 
-    testCompileOnly ("org.projectlombok:lombok:1.18.32")
-    testAnnotationProcessor ("org.projectlombok:lombok:1.18.32")
+    testCompileOnly("org.projectlombok:lombok:$lombok")
+    testAnnotationProcessor("org.projectlombok:lombok:$lombok")
 }
 
 tasks.test {

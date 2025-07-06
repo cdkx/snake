@@ -8,20 +8,17 @@ import static com.javarush.games.SnakeDirection.*;
 import static java.awt.event.KeyEvent.*;
 
 
+@Getter
 public class Room {
-    @Getter
     private final int width;
-    @Getter
     private final int height;
-    @Getter
-    private final Snake snake;
-    @Getter
-    private Mouse mouse;
-
-    public static Room game;
-    private int score;
-    private final int initialDelay = 350;
+    private final int initialDelay = 400;
     private final int delayStep = 25;
+    private final Snake snake;
+    private Mouse mouse;
+    private int score;
+    private static Room game;
+    private KeyboardObserver keyboardObserver;
 
     public Room(int width, int height, Snake snake) {
         this.width = width;
@@ -36,7 +33,7 @@ public class Room {
      */
     public void run() {
         //Создаем поток "наблюдатель за клавиатурой" и стартуем его.
-        KeyboardObserver keyboardObserver = new KeyboardObserver();
+        keyboardObserver = new KeyboardObserver(game);
         keyboardObserver.start();
 
         //пока змея жива
@@ -47,18 +44,12 @@ public class Room {
                 //Если равно символу 'q' - выйти из игры.
                 if (event.getKeyChar() == 'q') return;
 
-                //Если "стрелка влево" - сдвинуть фигурку влево
-                if (event.getKeyCode() == VK_LEFT)
-                    snake.setDirection(LEFT);
-                    //Если "стрелка вправо" - сдвинуть фигурку вправо
-                else if (event.getKeyCode() == VK_RIGHT)
-                    snake.setDirection(RIGHT);
-                    //Если "стрелка вверх" - сдвинуть фигурку вверх
-                else if (event.getKeyCode() == VK_UP)
-                    snake.setDirection(UP);
-                    //Если "стрелка вниз" - сдвинуть фигурку вниз
-                else if (event.getKeyCode() == VK_DOWN)
-                    snake.setDirection(DOWN);
+                switch (event.getKeyCode()) {
+                    case VK_LEFT -> snake.setDirection(LEFT);
+                    case VK_RIGHT -> snake.setDirection(RIGHT);
+                    case VK_UP -> snake.setDirection(UP);
+                    case VK_DOWN -> snake.setDirection(DOWN);
+                }
             }
 
             snake.move();   //двигаем змею
@@ -75,9 +66,9 @@ public class Room {
      * Выводим на экран текущее состояние игры
      */
     public void print() {
-        if (KeyboardObserver.frame != null) {
-            KeyboardObserver.frame.setContentPane(new Layer());
-            KeyboardObserver.frame.setVisible(true);
+        if (keyboardObserver.getFrame() != null) {
+            keyboardObserver.getFrame().setContentPane(new Layer(this));
+            keyboardObserver.getFrame().setVisible(true);
         }
     }
 
@@ -106,10 +97,10 @@ public class Room {
         try {
             int level = snake.getSections().size();
             int delay;
-            if (level < 16) {
+            if (level < 12) {
                 delay = initialDelay - delayStep * level;
             } else {
-                delay = 100; // минимальная задержка
+                delay = 75; // минимальная задержка
             }
             Thread.sleep(delay);
         } catch (InterruptedException ignored) {
@@ -119,6 +110,7 @@ public class Room {
     public static void main(String[] args) {
         game = new Room(20, 20, new Snake(10, 10));
         game.snake.setDirection(DOWN);
+        game.snake.setGame(game);
         game.createMouse();
         game.run();
     }
